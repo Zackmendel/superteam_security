@@ -4,6 +4,10 @@ from datetime import datetime
 import importlib 
 import re 
 
+import os
+print("Current working directory:", os.getcwd())
+print("Files in current directory:", os.listdir())
+
 
 # --- Configuration ---
 APP_TITLE = "🔐 Solana Security Explorer"
