@@ -269,6 +269,7 @@ if selected_page_from_radio != current_page:
 current_page = st.session_state["page"] # Re-get state in case it was just updated
 
 if current_page == HOME_VIEW_NAME:
+    st.title(:red["This App is not fully functional yet, it is a draft and the real thing should be ready by day end.]")
     st.title("📜 Solana Security Incidents - Chronological Table")
 
     df = pd.DataFrame(incident_data)
