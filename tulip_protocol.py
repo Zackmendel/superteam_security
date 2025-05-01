@@ -48,32 +48,63 @@ def display_content():
     st.image("images/tulip.jpeg")  
 
     st.markdown("""
-## Tulip Protocol Exploit Report (October 12, 2022)
-                
-**1. Brief description of the protocol**  
-Tulip Protocol (formerly SolFarm) is a Solana-based yield aggregator offering auto-compounding vaults, leveraged farming (up to 3×), and low-risk lending services via tuAssets. The attacker’s main Mango account was `4ND8FVPjUGGjx9VuGFuJefDWpg3THb58c277hbVRnjNa`.  
 
-**2. Exploit summary**  
-- **Oct 11, 2022, 19:36 UTC**: Attacker created and funded Mango Account 1 with an initial 25 K USDC, then topped it up to ~5.525 M USDC across multiple transfers.  
-- **Oct 11–12, 2022**: Using two Mango accounts, they placed outsized short and long positions on MNGO perpetual futures, driving the on-chain price from ~$0.038 to ~$0.91 within minutes.  
-- **Oct 12, 2022**: Tulip’s auto-compounding vaults, which had deployed user funds into Mango’s liquidity pools, saw ~$2.5 M drained when the attacker withdrew collateral and assets.  
+# :blue[Tulip Protocol Exploit Report (October 12, 2022)]
 
-**3. Technical analysis**  
-Tulip’s vaults relied directly on Mango’s cross-margin lending pools and on-chain price oracles without additional sanity checks. The exploit unfolded in three phases:  
-1. **Oracle manipulation**: The attacker skewed Mango’s MNGO oracle price via perp order placement.  
-2. **Collateral inflation**: Vault deposits reflected inflated MNGO values, allowing excessive borrowing.  
-3. **Asset extraction**: Stolen collateral (USDC, SOL, SRM, etc.) was pulled from both Mango and Tulip-connected pools, resulting in ~$2.5 M of losses.  
+## :red[1. A Brief Description of the Protocol]
 
-**4. Protocol response and aftermath**  
-- Vaults were immediately paused; deposits and withdrawals halted.  
-- On Oct 26, Tulip announced recovery of the lost $2.5 M and re-enabled USDC and $RAY strategy vaults under tightened risk controls.  
-- Tulip refactored its risk model: halted direct Mango integrations, adopted multi-source oracles (e.g., Pyth), and imposed position limits.  
+Tulip Protocol (formerly SolFarm) is a Solana-based yield aggregator offering auto-compounding vaults, leveraged farming (up to 3×), and low-risk lending services via tuAssets.
 
-**5. Lessons learnt**  
-- **Cross-protocol risk management**: Composability amplifies external exploits—monitor and cap third-party interactions.  
-- **Oracle resilience**: Implement multi-source feeds with sanity checks and circuit breakers.  
-- **Diversification & insurance**: Spread yield across multiple protocols and maintain an insurance buffer for bad-debt coverage.  
+- Attacker's Wallet Address: **:orange[4ND8FVPjUGGjx9VuGFuJefDWpg3THb58c277hbVRnjNa]**
 
-**6. Conclusion**  
+---
+
+## :orange[2. Exploit Summary]
+
+- **:green[Oct 11, 2022, 19:36 UTC:]** Attacker created and funded Mango Account 1 with an initial 25 K USDC, then topped it up to ~5.525 M USDC across multiple transfers.
+
+- **:orange[Oct 11–12, 2022:]** Using two Mango accounts, they placed outsized short and long positions on MNGO perpetual futures, driving the on-chain price from ~$0.038 to ~$0.91 within minutes.
+
+- **:green[Oct 12, 2022:]** Tulip’s auto-compounding vaults, which had deployed user funds into Mango’s liquidity pools, saw ~$2.5 M drained when the attacker withdrew collateral and assets.
+
+---
+
+## :green[3. Technical Analysis]
+
+Tulip’s vaults relied directly on Mango’s cross-margin lending pools and on-chain price oracles without additional sanity checks. The exploit unfolded in three phases:
+
+- **:green[1. Oracle manipulation:]** The attacker skewed Mango’s MNGO oracle price via perp order placement.
+
+- **:orange[2. Collateral inflation:]** Vault deposits reflected inflated MNGO values, allowing excessive borrowing.
+
+- **:green[3. Asset extraction:]** Stolen collateral (USDC, SOL, SRM, etc.) was pulled from both Mango and Tulip-connected pools, resulting in ~$2.5 M of losses.
+
+---
+
+## :blue[4. Protocol Response and Aftermath]
+
+- **:green[Vault Pausing:]** Vaults were immediately paused; deposits and withdrawals halted.
+
+- **:orange[Recovery Announcement:]** On Oct 26, Tulip announced recovery of the lost 2.5M USD and re-enabled USDC and $RAY strategy vaults under tightened risk controls.
+
+- **:green[Risk Refactor:]** Tulip refactored its risk model: halted direct Mango integrations, adopted multi-source oracles (e.g., Pyth), and imposed position limits.
+
+---
+
+## :violet[5. Lessons Learnt]
+
+- **:green[Cross-protocol risk management:]** Composability amplifies external exploits—monitor and cap third-party interactions.
+
+- **:orange[Oracle resilience:]** Implement multi-source feeds with sanity checks and circuit breakers.
+
+- **:green[Diversification & insurance:]** Spread yield across multiple protocols and maintain an insurance buffer for bad-debt coverage.
+
+- **:green[Transparency:]** Protocols need to disclose upgrade authority models clearly to users.
+
+---
+
+## :red[6. Conclusion]
+
 The Oct 12, 2022 incident underscores the perils of unchecked composability: a Mango Markets exploit cascaded into Tulip’s vaults, draining ~$2.5 M. Tulip’s subsequent risk overhaul now serves as a blueprint for secure cross-protocol DeFi integrations.
+
 """)

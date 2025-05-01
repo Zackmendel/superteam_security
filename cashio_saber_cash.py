@@ -49,19 +49,23 @@ def display_content():
     st.image("images/cash.io.jpeg")  
 
     st.markdown("""
-# Cashio (Saber Cash) Exploit Report
+# :blue[Cashio (Saber Cash) Exploit Report]
+                
+---                
 
 This report provides a detailed analysis of the Cashio (Saber Cash) exploit that occurred in March 2022 on the Solana blockchain.
                 
-### Exploiter wallet address: `6D7fgzpPZXtDB6Zqg3xRwfbohzerbytB2U5pFchnVuzw`
-
-## 1. Brief Description of the Protocol
+---
+                
+## :red[1. Brief Description of the Protocol]
 
 Cashio, also known as Saber Cash, was a decentralized stablecoin protocol built on the Solana network. Its native token, CASH, was designed to be fully backed by interest-bearing Saber USD liquidity provider (LP) tokens. Users could mint CASH by depositing approved collateral, primarily Saber LP tokens, into the protocol's smart contracts. The protocol consisted of different programs, notably "Bankman" for managing approved collateral and "Brrr" for handling the minting and burning of CASH tokens based on deposited collateral.
 
 The attacker's primary wallet address on Solana associated with the exploit is reported as `6D7fgzpPZXtDB6Zqg3xRwfbohzerbytB2U5pFchnVuzw`. Funds were subsequently moved to other addresses, including on Ethereum.
 
-## 2. Exploit Summary
+---
+                
+## :orange[2. Exploit Summary]
 
 The Cashio exploit, which resulted in a loss of approximately $52.8 million, was a classic "infinite mint" vulnerability executed in March 2022. The attacker identified a critical flaw in how the Cashio protocol verified the collateral used to mint CASH tokens.
 
@@ -72,7 +76,9 @@ With the fake collateral accepted, the attacker proceeded to mint an enormous am
 Immediately after minting the unbacked CASH, the attacker moved swiftly to convert these worthless tokens into valuable assets. They swapped the newly minted CASH for legitimate stablecoins like USDC, USDT, and UST on the Saber decentralized exchange.
 
 Following the swaps, the attacker began moving the stolen funds off the Solana network, with some assets being transferred to Ethereum via bridges like Wormhole and Paraswap, likely to further obscure the trail. In a peculiar turn, the attacker embedded a message in an Ethereum transaction, stating that accounts with less than $100k would have their funds returned and the rest would be donated to charity, though the extent of actual returns or donations remains unclear.
-    
+
+---                
+
 """)
 
     csva = pd.read_csv("csv_files/cash_io/wallet_summary.csv")
@@ -118,8 +124,10 @@ In summary, the exploiter's wallet activity began with high-value swaps and tran
 """)
 
 
-    st.markdown("""            
-## 3. Technical Analysis
+    st.markdown("""  
+---                
+
+## :green[3. Technical Analysis]
 
 The root cause of the Cashio exploit was a critical missing validation check within the protocol's "Brrr" program, specifically in the logic designed to verify the deposited collateral. The "Brrr" program was responsible for ensuring that the tokens presented by a user as collateral were legitimate Saber LP tokens, which were the approved backing for CASH.
 
@@ -135,6 +143,9 @@ The attacker exploited this by:
 5.  The program then executed the minting logic, issuing billions of CASH tokens to the attacker's wallet without any real assets being locked.
 
 The impact was devastating. The unbacked minting of CASH tokens devalued the stablecoin to near zero, causing significant losses for users holding CASH or providing liquidity in CASH pairs. The attacker was able to drain valuable assets from Saber's liquidity pools by swapping the fraudulently minted CASH, resulting in a total loss of approximately $52.8 million.
+                
+---                
+                
                 """)
     
 
@@ -296,7 +307,7 @@ The impact was devastating. The unbacked minting of CASH tokens devalued the sta
     
     st.markdown("""
 
-## 4. Protocol Response and Aftermath
+## :blue[4. Protocol Response and Aftermath]
 
 In the immediate aftermath of the exploit, the value of the CASH stablecoin plummeted to virtually zero. The Cashio team acknowledged the hack and advised users to withdraw liquidity from any pools involving CASH.
 
@@ -306,7 +317,10 @@ Efforts were made to trace the flow of the stolen assets, which were moved acros
 
 The Cashio project's activity significantly slowed down following the exploit. While there were discussions and announcements about plans for a new protocol to potentially help victims and rebuild, the long-term status and future of the Cashio project and these recovery plans remain largely unclear.
 
-## 5. Lessons Learned
+---                
+
+
+## :violet[5. Lessons Learned]
 
 The Cashio exploit provided several critical lessons for the DeFi ecosystem, particularly on Solana:
 
@@ -316,10 +330,13 @@ The Cashio exploit provided several critical lessons for the DeFi ecosystem, par
 * **Risks of New/Unaudited Protocols:** Users should be extremely cautious when interacting with new or unaudited DeFi protocols, especially those involving significant value. The promise of high yields often comes with higher, sometimes hidden, risks.
 * **Importance of Community and Transparency:** While the attacker's message was unusual, the incident highlighted the importance of clear and timely communication from protocol teams during and after an exploit.
 
-## 6. Conclusion
+---                
+
+
+## :red[6. Conclusion]
 
 The Cashio exploit was a significant security breach on the Solana network, resulting in the loss of over $52 million due to an infinite mint vulnerability. The exploit was made possible by a fundamental flaw in the protocol's collateral validation logic, which failed to verify the legitimacy of the token used for minting CASH. The incident underscored the critical importance of rigorous smart contract security, comprehensive audits, and robust input validation in the rapidly evolving DeFi space. While the aftermath saw some unusual interactions from the attacker and efforts to trace funds, the majority of assets remained lost, serving as a potent reminder of the risks associated with unaudited and vulnerable protocols.
-                
+             
 """)
 
     # You could add charts, images, or other Streamlit components here

@@ -48,19 +48,23 @@ def display_content():
     st.image("images/wormhole_bridge.jpeg")  
 
     st.markdown("""
-# Wormhole Bridge Exploit Report
+# :blue[Wormhole Bridge Exploit Report]
 
 This report details the Wormhole bridge exploit that occurred in February 2022, analyzing the attack, its technical underpinnings, the protocol's response, and the lessons learned.
 
 ### Exploiter wallet address: `CxegPrfn2ge5dNiQberUrQJkHCcimeR4VXkeawcFBBka`
+                
+---
 
-## 1. Brief Description of the Protocol
+## :red[1. Brief Description of the Protocol]
 
 Wormhole is a decentralized cross-chain bridge protocol that allows users to transfer tokens and data between different blockchain networks. It facilitates interoperability by locking assets on one chain and minting corresponding "wrapped" assets on another, or by relaying messages and data between chains. The protocol relies on a network of validators, known as "Guardians," to observe events on one chain and sign messages that attest to those events, allowing actions to be taken on another chain.
 
 The attacker's wallet address involved in the exploit, based on the activity log provided, is associated with a series of transactions including large transfers, swaps, and bridging activities. Some of the initial large transfers of CASH and USDC, followed by bridging ETH and UST, and then numerous smaller USDC transfers, paint a picture of the attacker's movements post-exploit.
 
-## 2. Exploit Summary
+---
+                
+## :orange[2. Exploit Summary]
 
 The Wormhole exploit unfolded like a high-stakes digital heist in early February 2022. It began when an attacker identified a critical vulnerability in the protocol's VAA (Validator Action Approval) verification process on the Solana side.
 
@@ -72,7 +76,19 @@ Following the successful minting, the attacker's onchain activity, as detailed i
 
 The entire sequence, from the initial exploit to the subsequent movement of funds, occurred relatively quickly, demonstrating the attacker's preparedness and efficiency in executing the post-exploit strategy.
 
+---             
+                
 """)
+    
+    st.markdown("""
+# :blue[On-chain Activity Analysis]
+                
+---
+                
+From our analysis on-chain, an approximate total of 120,000ETH(328.4M USD) was bridged into Solana by the attacker using an error from the bridge software, out of which a total of 93,750ETH(~$256.5M) was bridged out to ethereum(out of Solana tracking was not done) in a five(5) minutes timeframe by the attacker.
+                
+---
+                """)
 
     csva = pd.read_csv("csv_files/wormhole/wallet_summary.csv")
     csvb = pd.read_csv("csv_files/wormhole/timediff.csv")
@@ -94,10 +110,32 @@ The entire sequence, from the initial exploit to the subsequent movement of fund
         value1 = millify(csvb["AMOUNT_USD"][1], precision=2) # Use the millify value
         render_metric_box(label1, value1)
 
-    st.subheader("Exploiter's Wallet On-chain Summary")
+    st.subheader(":blue[Exploiter's Wallet On-chain Summary]")
     st.dataframe(csva, use_container_width=True, hide_index=True)
 
+    st.markdown("""
+---
+                
+### :blue[Attacker's Wallet History Summary:]
+- Primary haul: 120 000 ETH ($328 M) bridged out, almost entirely routed to Solana.
+- Key conversions:
+    - ~18 M USDC & ~5 M USDC → ~163 000 SOL.
+    - SOL proceeds (150 000 SOL initial tranche + numerous smaller chunks) converted back into dozens of stablecoin tranches.
+- Mixing strategy: Large‑scale transfers into multiple custodial addresses, frequent small‑batch swaps, and cross‑asset fragmentation (ETH ⇄ SOL ⇄ USDC/USDT/DAI/USDCe/USDT e t).
+- Temporal pattern:
+    - T = 0–4 min: Rapid bridging and wallet‑to‑wallet shuffles.
+    - T = 4–181 min: Bulk transfers and swaps.
+    - T = 346 days & T = 9–17 days: Long‑term cash‑out and micro‑mixing transactions.
+
+This pattern reflects a classic "smash‑and‑grab" exploit followed by aggressive layering and mixing to launder proceeds across chains.
+                
+""")
+
     with st.expander("Summarizing Wallet Activity"):
+        
+        
+        
+        
         st.markdown("""
 
 Here’s a high‑level, phase‑by‑phase breakdown of the exploiter’s on‑chain movements following the Wormhole bridge hack:
@@ -161,7 +199,7 @@ This pattern reflects a classic “smash‑and‑grab” exploit followed by agg
 
 
     st.markdown("""            
-## 3. Technical Analysis
+## :green[3. Technical Analysis]
 
 The root cause of the Wormhole exploit lay in a vulnerability within the logic that verified VAA messages on the Solana side of the bridge. VAAs are essentially signed messages from the Wormhole Guardians confirming an event on one chain (like a deposit). These VAAs are then used by the Wormhole contract on another chain to trigger a corresponding action (like minting wrapped tokens).
 
@@ -247,6 +285,8 @@ The impact was immediate and severe. The exploit resulted in the unauthorized mi
 
         st.plotly_chart(fig_2, use_container_width=True)
 
+    st.write("The attacker performed a couple of swaps, out of which the most noticeable was from USDC-SOL of about $23M in total.")
+
         # ---------------------------------------------------------------------------------------------------------------
     st.subheader("Exploiter Transfer Timeline")
     
@@ -305,7 +345,7 @@ The impact was immediate and severe. The exploit resulted in the unauthorized mi
     
     st.markdown("""
 
-## 4. Protocol Response and Aftermath
+## :blue[4. Protocol Response and Aftermath]
 
 The Wormhole team and community reacted swiftly upon discovering the exploit. Recognizing the severity of the situation and the need to prevent further damage and restore confidence, they took immediate steps:
 
@@ -323,7 +363,7 @@ The Wormhole team and community reacted swiftly upon discovering the exploit. Re
 
 The aftermath saw the Wormhole bridge successfully brought back online after the vulnerability was fixed and the liquidity was restored. While the incident was a major setback, the swift response and the substantial bailout by Jump Crypto helped to mitigate the long-term damage to the protocol's reputation and functionality, though it highlighted the inherent risks in cross-chain bridging.
 
-## 5. Lessons Learned
+## :violet[5. Lessons Learned]
 
 The Wormhole exploit provided several critical lessons for the development and operation of cross-chain bridges and the broader DeFi ecosystem:
 
@@ -339,7 +379,7 @@ The Wormhole exploit provided several critical lessons for the development and o
 
 * **The Cost of Interoperability:** The exploit served as a stark reminder of the significant financial risks associated with achieving interoperability between blockchains through bridging mechanisms. The large bailout highlighted the potential costs when security fails.
 
-## 6. Conclusion
+## :red[6. Conclusion]
 
 The Wormhole bridge exploit was one of the largest in DeFi history, resulting in the loss of over $320 million worth of wETH. The attack exploited a critical vulnerability in the VAA verification process on the Solana side of the bridge, allowing the attacker to mint unauthorized assets. The incident highlighted the significant security challenges inherent in cross-chain interoperability protocols. While the protocol team and a key contributor responded rapidly to patch the vulnerability and restore liquidity, the exploit served as a crucial, albeit costly, lesson for the entire blockchain ecosystem on the paramount importance of security, rigorous auditing, and robust incident response in the complex world of cross-chain bridges. The event continues to influence how cross-chain solutions are designed and secured.
 """)

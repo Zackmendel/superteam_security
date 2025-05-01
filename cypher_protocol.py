@@ -54,7 +54,7 @@ def display_content():
 
 The Cypher Protocol was a decentralized finance (DeFi) protocol operating on the Solana blockchain. It aimed to provide a range of services, including lending, borrowing, and trading of various digital assets. The protocol utilized smart contracts to manage user funds and execute operations automatically. At the time of the exploit, the protocol held significant user deposits across different markets.
 
-The attacker's wallet address associated with the exploit is reportedly: **:orange[`9WzDxLzdtpx2pQ1WfS9P8VdJbLz7v9W2p1bX7pQ1bX7p`]** (Note: This is a placeholder address as the exact address might vary across reports; always verify with official sources or blockchain explorers).
+The attacker's wallet address associated with the exploit is reportedly: **:orange[`HHm4wK91XvL3hhEC4hQHo544rtvkaKohQPc59TvZeC71`]** (Note: This is a placeholder address as the exact address might vary across reports; always verify with official sources or blockchain explorers).
 
 ## :orange[2. Exploit Summary]
 

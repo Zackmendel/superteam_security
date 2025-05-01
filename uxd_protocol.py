@@ -48,31 +48,66 @@ def display_content():
     st.image("images/uxd.jpeg")  
 
     st.markdown("""
-**1. A brief description of the protocol**  
-UXD Protocol is an algorithmic stablecoin on Solana that mints $UXD by allocating collateral across yield strategies—including lending protocols and liquidity pools such as Mango Markets—via its asset-liability management module. The attacker’s wallets were  
-`CQvKSNnYtPTZfQRQ5jkHq8q2swJyRsdQLcFcj3EmKFfX` and `4ND8FVPjUGGjx9VuGFuJefDWpg3THb58c277hbVRnjNa`.  
 
-**2. Exploit summary**  
-- **Oct 11, 2022 (evening UTC)**: Attacker funds two Mango accounts and opens outsized positions on MNGO perpetual futures, driving the on-chain price from ~$0.03 to $0.91 within minutes.  
-- **Oct 12, 2022 (early UTC)**: Inflated MNGO collateral allows the attacker to borrow the entire USDC, SOL, SRM, and other pools—draining Mango Markets of ~$116 million and triggering large unrealized losses for UXD.  
-- **Immediate impact**: UXD’s vaults, with ~$19.97 million deployed into Mango, see their collateral valuations collapse, forcing a pause on minting and redemptions.  
+# :blue[UXD Protocol Exploit Report (October 12, 2022)]
 
-**3. Technical analysis**  
-The core vulnerability was UXD’s reliance on Mango’s single-source price oracle without sanity checks, paired with instant reuse of unrealized perp profits as collateral. Oracle manipulation inflated UXD collateral by over 20×, creating bad debt that overwhelmed its insurance buffer.  
+## :red[1. A Brief Description of the Protocol]
 
-**4. Protocol response and aftermath**  
-- **Oct 12**: UXD paused all mint and redeem functions to halt further exposure.  
-- **Oct 20**: Mango Markets opened the claims process for affected partners.  
-- **Oct 26**: UXD recovered 1,601,017.23 USDC, 125,637.9371 SOL, 4,953.65348 SRM, and 10,000.34093 MNGO (≈19,965,020.91 USDC) and replenished its insurance fund.  
-- **Risk overhaul**: UXD integrated multi-source oracles, added circuit breakers, enforced position limits, and increased insurance reserves.  
+UXD Protocol is an algorithmic stablecoin on Solana that mints $UXD by allocating collateral across yield strategies—including lending protocols and liquidity pools such as Mango Markets—via its asset-liability management module.
 
-**5. Lessons learnt**  
-- Integrate decentralized, multi-source oracles with sanity checks and circuit breakers.  
-- Enforce strict position-size limits relative to market liquidity.  
-- Maintain over-collateralization buffers and fee-funded insurance pools.  
-- Embed pre-approved pause and recovery governance mechanisms.  
+- Attacker's Wallet Address: **:orange[CQvKSNnYtPTZfQRQ5jkHq8q2swJyRsdQLcFcj3EmKFfX]**  
+- Attacker's Wallet Address: **:orange[4ND8FVPjUGGjx9VuGFuJefDWpg3THb58c277hbVRnjNa]**
 
-**6. Conclusion**  
+---
+
+## :orange[2. Exploit Summary]
+
+- **:green[Oct 11, 2022 (evening UTC):]** Attacker funds two Mango accounts and opens outsized positions on MNGO perpetual futures, driving the on-chain price from ~0.03 USD to 0.91 USD within minutes.
+
+- **:orange[Oct 12, 2022 (early UTC):]** Inflated MNGO collateral allows the attacker to borrow the entire USDC, SOL, SRM, and other pools—draining Mango Markets of ~$116 million and triggering large unrealized losses for UXD.
+
+- **:green[Immediate impact:]** UXD’s vaults, with ~$19.97 million deployed into Mango, see their collateral valuations collapse, forcing a pause on minting and redemptions.
+
+The exploit narrative wasn’t a direct "funds stolen" attack through Serum’s existing contracts, but rather a critical loss of **trust and security** through potential control of Serum’s upgrade path.
+
+---
+                                
+## :green[3. Technical Analysis]
+
+The core vulnerability was UXD’s reliance on Mango’s single-source price oracle without sanity checks, paired with instant reuse of unrealized perp profits as collateral. Oracle manipulation inflated UXD collateral by over 20×, creating bad debt that overwhelmed its insurance buffer.
+
+---
+
+## :blue[4. Protocol Response and Aftermath]
+
+- **:green[Oct 12:]** UXD paused all mint and redeem functions to halt further exposure.
+
+- **:orange[Oct 20:]** Mango Markets opened the claims process for affected partners.
+
+- **:green[Oct 26:]** UXD recovered 1,601,017.23 USDC, 125,637.9371 SOL, 4,953.65348 SRM, and 10,000.34093 MNGO (≈19,965,020.91 USDC) and replenished its insurance fund.
+
+- **:orange[Risk overhaul:]** UXD integrated multi-source oracles, added circuit breakers, enforced position limits, and increased insurance reserves.
+
+---
+
+## :violet[5. Lessons Learnt]
+
+- **:green[Decentralized oracles:]** Integrate decentralized, multi-source oracles with sanity checks and circuit breakers.
+
+- **:orange[Position limits:]** Enforce strict position-size limits relative to market liquidity.
+
+- **:green[Insurance buffers:]** Maintain over-collateralization buffers and fee-funded insurance pools.
+
+- **:orange[Governance controls:]** Embed pre-approved pause and recovery governance mechanisms.
+
+---
+
+- **:green[Transparency:]** Protocols need to disclose upgrade authority models clearly to users.
+
+## :red[6. Conclusion]
+
 The Oct 12, 2022 UXD Protocol exploit highlights how single-source oracle risks and rapid reuse of unrealized gains can cascade across composable DeFi. UXD’s swift suspension, full recovery of ~$19.97 million, and comprehensive risk-parameter overhaul now serve as a blueprint for resilient algorithmic stablecoin design.
+
 """)
+
 

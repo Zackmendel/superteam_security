@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from millify import millify
 import plotly.express as px
+import plotly.graph_objects as go
 
 def render_metric_box(label: str, value: str):
     st.markdown(
@@ -48,30 +49,58 @@ def display_content():
     st.image("images/crema_finance.jpeg")  
 
     st.markdown("""
-    # Crema Finance Exploit Report
+  
+# :blue[Crema Finance Exploit Report]
 
-    This report details the Crema Finance exploit that occurred on July 2, 2022, analyzing the attack, its technical underpinnings, the protocol's response, and the lessons learned.
+## :red[1. A Brief Description of the Protocol]
 
-    ## 1. Brief Description of the Protocol
+Crema Finance was a concentrated liquidity protocol built on the Solana blockchain. It aimed to improve capital efficiency for liquidity providers by allowing them to define narrow price ranges for their positions—a model known as Concentrated Liquidity Market Making (CLMM), which was seen as an evolution beyond traditional AMM mechanisms.
 
-    Crema Finance was a concentrated liquidity protocol built on the Solana blockchain. It aimed to provide efficient trading and yield farming opportunities by allowing liquidity providers to specify narrow price ranges for their liquidity. This approach, known as Concentrated Liquidity Market Making (CLMM), was presented as an improvement over traditional Automated Market Maker (AMM) models.
+- Attacker's Wallet Address: **:orange[`Esmx2Q...` (Solana)]**, **:orange[`0x8021...` (Ethereum)]**
 
-    The attacker's wallet addresses associated with the exploit include a Solana address, reported as `Esmx2Q...`, and an Ethereum address, reported as `0x8021...`, to which funds were bridged after the attack.
+---
 
-    ## 2. Exploit Summary
+## :orange[2. Exploit Summary]
 
-    The Crema Finance exploit in July 2022 was a sophisticated attack that leveraged flash loans and a vulnerability in the protocol's fee calculation mechanism, resulting in the theft of approximately $8.8 million.
+On July 2, 2022, Crema Finance suffered an exploit that resulted in a loss of approximately 8.8 million USD. The attacker used a flash loan from Solend and took advantage of a vulnerability in Crema's tick account fee calculation system. By introducing a fake tick account that bypassed proper validation checks, the exploiter manipulated the fee calculation mechanism to withdraw exaggerated fees from the protocol.
 
-    The attack began with the exploiter setting up a malicious on-chain program and creating a fake "tick account." In Crema's CLMM model, tick accounts stored crucial pricing information used, in part, to calculate transaction fees.
+The attacker returned a majority of the funds in exchange for a $1.68 million white hat bounty after negotiation with the Crema team.
 
-    The attacker then took out a large flash loan from another Solana lending protocol, Solend. Using this borrowed capital, they interacted with a Crema liquidity pool.
+---
+The exploit narrative wasn’t a direct "funds stolen" attack through Serum’s existing contracts, but rather a critical loss of **trust and security** through potential control of Serum’s upgrade path.
+ 
+                """)
+    
 
-    The core of the exploit involved the attacker tricking the Crema protocol into using their fake tick account instead of the legitimate one for fee calculations. By manipulating the data in this fake account, the attacker was able to claim an excessively large amount of fees from the liquidity pool during their flash loan transaction.
+    csva = pd.read_csv("csv_files/crema_finance/wallet_summary.csv")
+    csvb = pd.read_csv("csv_files/crema_finance/timediff.csv")
+    csvc = pd.read_csv("csv_files/crema_finance/bridge.csv")
+    csvd = pd.read_csv("csv_files/crema_finance/swaps.csv")
+    csve = pd.read_csv("csv_files/crema_finance/transfers.csv")
+    csvf = pd.read_csv("csv_files/crema_finance/net_transfer.csv")
 
-    After successfully draining funds by claiming these inflated fees, the attacker repaid the flash loan to Solend within the same transaction. The remaining stolen assets, primarily SOL and stablecoins (USDCet), were then swapped and bridged to the Ethereum network to the attacker's address.
+    col_1, col_2, col_3 = st.columns(3, gap='large')
+    with col_1:
+        # --- Replace st.metric with custom HTML markdown ---
+        label1 = "Token Stolen - USD"
+        value1 = millify(csvf["AMOUNT_USD"][0], precision=2)  # Use the millify value
+        render_metric_box(label1, value1)
 
-    Following the exploit, the Crema Finance team engaged in negotiations with the attacker, which unusually resulted in the return of most of the stolen funds in exchange for a "white hat" bounty.
-        """)
+    with col_2:
+        # --- Replace st.metric with custom HTML markdown ---
+        label1 = "Amount Bridged out - USD"
+        value1 = millify(csvb["AMOUNT_USD"][0], precision=2)  # Use the millify value
+        render_metric_box(label1, value1)
+
+
+    with col_3:
+         # --- Replace st.metric with custom HTML markdown ---
+        label1 = "Time Diff Between Outbound Bridges"
+        value1 = millify(csvb["TIME_DIFF"][0], precision=2) # Use the millify value
+        render_metric_box(label1, value1)
+
+    st.subheader("Exploiter's Wallet On-chain Summary")
+    st.dataframe(csva, use_container_width=True, hide_index=True)
     
 
     with st.expander("Summarizing Wallet Activity"):
@@ -124,47 +153,216 @@ The activity suggests a sophisticated operation involving the exploitation of vu
 """)
 
     st.markdown("""
-    ## 3. Technical Analysis
 
-    The technical vulnerability exploited in the Crema Finance hack resided in the protocol's handling and verification of "tick accounts," which were fundamental to its Concentrated Liquidity Market Maker (CLMM) model. These accounts stored tick data essential for calculating transaction fees within the liquidity pools.
+## :green[3. Technical Analysis]
 
-    The specific flaw allowed an attacker to "spoof" or substitute a legitimate tick account with a fake one they controlled. While the protocol performed some basic owner checks on the tick account, it failed to implement sufficient validation to ensure that the provided tick account was the *correct* and *authentic* one associated with the specific liquidity pool being interacted with.
+The vulnerability centered on Crema’s tick accounts, which stored crucial pricing data used in fee computation. Crema's system failed to adequately verify that the tick account being referenced in a transaction was authentic and belonged to the correct pool.
 
-    The attacker's exploit sequence was as follows:
-    1.  **Create Fake Tick Account:** The attacker created a new account on Solana and populated it with manipulated data designed to influence fee calculations.
-    2.  **Obtain Flash Loan:** A large, uncollateralized flash loan was taken from Solend. This provided the attacker with significant capital to interact with the Crema liquidity pool.
-    3.  **Interact with Crema Pool:** The attacker initiated a transaction with a Crema CLMM pool, depositing the flash-loaned tokens.
-    4.  **Spoof Tick Account:** Crucially, during the transaction where fees were calculated and claimed, the attacker forced the Crema protocol to reference their fake tick account instead of the pool's real one.
-    5.  **Claim Inflated Fees:** Because the fake tick account contained manipulated data, the fee calculation resulted in an artificially inflated amount. The attacker's transaction was structured to claim this enormous, illegitimate fee amount from the pool's reserves.
-    6.  **Repay Flash Loan:** Within the atomic flash loan transaction, the attacker repaid the borrowed funds to Solend.
-    7.  **Withdraw Remaining Funds:** The significant amount of assets claimed as inflated fees, minus the flash loan repayment, represented the attacker's profit. These funds were then moved and bridged.
+The attack sequence included:
 
-    The impact of the exploit was the draining of approximately $8.8 million worth of assets from Crema Finance's liquidity pools. The vulnerability in tick account validation allowed the attacker to manipulate the protocol's internal logic for financial gain, demonstrating how insufficient input validation can be exploited, especially when combined with mechanisms like flash loans that provide large amounts of capital for rapid, complex transactions.
+- **:green[1. Create Fake Tick Account:]** The attacker initialized a tick account with manipulated data on Solana.
 
-    ## 4. Protocol Response and Aftermath
+- **:orange[2. Obtain Flash Loan:]** A large uncollateralized flash loan was taken from Solend.
 
-    Upon discovering the exploit on July 2, 2022, Crema Finance immediately suspended its smart contracts and halted all activity on the protocol to prevent further losses. The team launched an investigation with the help of blockchain security experts.
+- **:green[3. Interact with CLMM Pool:]** The attacker interacted with Crema’s pool using the borrowed assets.
 
-    In a somewhat unusual turn for a major DeFi hack, the Crema Finance team managed to establish communication with the attacker. They publicly offered a "white hat" bounty of $800,000 for the return of the stolen funds.
+- **:orange[4. Spoof Tick Account:]** Instead of using the genuine tick account, the attacker substituted their own manipulated version.
 
-    After a period of negotiation, the attacker agreed to return most of the stolen assets. The final agreement involved the attacker keeping 45,455 SOL (valued at approximately $1.68 million at the time) as a bounty, and returning the remaining funds, which amounted to roughly $8.3 million in ETH and SOL. The return of funds occurred in several transactions.
+- **:green[5. Claim Inflated Fees:]** The fake data led the protocol to overpay transaction fees to the attacker.
 
-    Following the return of assets, Crema Finance focused on creating a compensation plan for affected users. The protocol remained suspended while the team worked on patching the vulnerability and undergoing further security audits.
+- **:orange[6. Repay Flash Loan:]** The borrowed funds were returned within the same atomic transaction.
 
-    Later, in July 2023, a former security engineer named Shakeeb Ahmed was arrested and charged in the US in connection with the Crema Finance hack, indicating that law enforcement efforts continued even after the partial return of funds and the white hat agreement.
+- **:green[7. Withdraw and Bridge Remaining Funds:]** The illicit profits were swapped and bridged to Ethereum.
 
-    ## 5. Lessons Learned
+---
+""")
+    
 
-    The Crema Finance exploit offered valuable lessons for the Solana ecosystem and DeFi in general:
+     # ---------------------------------------------------------------------------------------------------------------
+    st.subheader("Exploiter Bridge Timeline")
+    
+    col_1, col_2 = st.columns([1, 0.5], gap='large')
+    with col_1:
+        fig_1 = px.scatter(
+        csvc,
+        x="TIMESPAN",
+        y="AMOUNT_USD",
+        size="AMOUNT_USD",  # 🔥 Scale marker size
+        color="DIRECTION",
+        title="Bridge Amounts By Exploiter (ETH)",
+        height=500,
+        size_max=40  # optional: max bubble size in pixels
+        )
 
-    * **Criticality of Input Validation:** The exploit highlighted, once again, that insufficient validation of input accounts and data (like the tick account) is a major vulnerability vector in smart contracts. Developers must assume malicious input and validate everything rigorously.
-    * **Flash Loans as an Amplifier:** Flash loans themselves are not malicious, but they provide attackers with the capital needed to exploit logic vulnerabilities on a large scale within a single transaction. Protocols must be designed to be resilient against attacks using large amounts of capital.
-    * **Audits are Essential, But Not Guarantees:** While the specifics of Crema's code were not public, the exploit underscores that even protocols with some level of review can have vulnerabilities. Continuous security practices, including multiple audits and bug bounties, are crucial.
-    * **Complexity Increases Risk:** The CLMM model, while potentially efficient, added complexity that introduced unforeseen vulnerabilities. Simpler designs often have a smaller attack surface.
-    * **Incident Response and Communication:** Crema's swift action to halt the protocol and engage in communication (even if unusual) helped manage the crisis. A prepared incident response is vital.
-    * **Legal Consequences:** The later arrest of an individual linked to the attack serves as a reminder that even in the pseudonymous world of crypto, exploits can lead to real-world legal consequences.
+        fig_1.update_layout(hovermode="x unified")
 
-    ## 6. Conclusion
+        st.plotly_chart(fig_1, use_container_width=True)
 
-    The Crema Finance exploit was a significant security incident on Solana, resulting in the loss of approximately $8.8 million through a flash loan attack that exploited a vulnerability in the protocol's tick account validation. The attacker was able to manipulate fee calculations to drain funds. While the unusual negotiation led to the return of most assets in exchange for a bounty, the incident underscored the critical importance of robust input validation, the risks amplified by flash loans, and the ongoing need for stringent security practices in DeFi protocols. The subsequent arrest also highlighted the potential for accountability in the aftermath of such attacks.
-    """)
+    with col_2:
+        fig_2 = px.pie(
+        csvc,
+        names = "DIRECTION",
+        values = "AMOUNT_USD",
+        # color="DIRECTION",
+        title="Bridge Amounts By Exploiter (ETH)",
+        height=500,
+        )
+
+        fig_2.update_layout(hovermode="x unified")
+
+        st.plotly_chart(fig_2, use_container_width=True)
+
+
+
+
+        # ---------------------------------------------------------------------------------------------------------------
+
+    st.subheader("Exploiter Swap Timeline")
+    
+    col_1, col_2 = st.columns([1, 0.5], gap='large')
+    with col_1:
+        fig_1 = px.scatter(
+        csvd,
+        x="BLOCK_TIMESTAMP",
+        y="AMOUNT_USD",
+        size="AMOUNT_USD",  # 🔥 Scale marker size
+        color="ROUTE",
+        title="Swap Amounts By Exploiter(USD)",
+        height=500,
+        size_max=40  # optional: max bubble size in pixels
+        )
+
+        fig_1.update_layout(hovermode="x unified")
+
+        st.plotly_chart(fig_1, use_container_width=True)
+
+    with col_2:
+        fig_2 = px.pie(
+        csvd,
+        names = "ROUTE",
+        values = "AMOUNT_USD",
+        # color="DIRECTION",
+        title="Total Swap Amounts By Exploiter(USD)",
+        height=500,
+        )
+
+        fig_2.update_layout(hovermode="x unified")
+
+        st.plotly_chart(fig_2, use_container_width=True)
+
+        # ---------------------------------------------------------------------------------------------------------------
+    st.subheader("Exploiter Transfer Timeline")
+    
+    col_1, col_2, col_3 = st.columns([1.5, 1.2, 1], gap='small')
+    with col_1:
+        fig_1 = px.scatter(
+        csve,
+        x="BLOCK_TIMESTAMP",
+        y="AMOUNT_USD",
+        size="AMOUNT_USD",  # 🔥 Scale marker size
+        color="ROUTE",
+        title="Transfer Amounts By Exploiter(USD)",
+        height=500,
+        size_max=40  # optional: max bubble size in pixels
+        )
+
+        fig_1.update_layout(hovermode="x unified")
+
+        st.plotly_chart(fig_1, use_container_width=True)
+
+    with col_2:
+        csve_grouped = csve.groupby("SYMBOL", as_index=False).agg({
+            "AMOUNT_USD": "sum",
+            "AMOUNT": "sum"
+        })
+        # # csve_sorted = csve.sort_values(by="AMOUNT_USD")
+    
+        fig_2 = go.Figure()
+
+        # Bar chart (USD value on left axis)
+        fig_2.add_trace(go.Bar(
+            x=csve_grouped["SYMBOL"],
+            y=csve_grouped["AMOUNT_USD"],
+            name="AMOUNT_USD",
+            marker_color="lightskyblue",
+            yaxis="y1"
+        ))
+
+        # Line chart (Raw token amount on right axis)
+        fig_2.add_trace(go.Scatter(
+            x=csve_grouped["SYMBOL"],
+            y=csve_grouped["AMOUNT"],
+            name="AMOUNT",
+            mode="lines+markers",
+            line=dict(color="gold"),
+            yaxis="y2"
+        ))
+
+        # Layout with updated y-axis formatting
+        fig_2.update_layout(
+            title="Tokens Transferred by Exploiter",
+            height=500,
+            hovermode="x unified",
+            xaxis=dict(title="Token Symbol"),
+            yaxis=dict(
+                title=dict(text="USD Value", font=dict(color="lightskyblue")),
+                tickfont=dict(color="lightskyblue")
+            ),
+            yaxis2=dict(
+                title=dict(text="Raw Amount", font=dict(color="gold")),
+                tickfont=dict(color="gold"),
+                overlaying="y",
+                side="right"
+            )
+        )
+
+        st.plotly_chart(fig_2, use_container_width=True)
+
+    with col_3:
+        fig_3 = px.pie(
+        csve,
+        names = "ROUTE",
+        values = "AMOUNT_USD",
+        title="Transfer Amount by Direction",
+        height=500,
+        )
+
+        fig_3.update_layout(hovermode="x unified")
+
+        st.plotly_chart(fig_3, use_container_width=True)
+    
+    st.markdown("""
+## :blue[4. Protocol Response and Aftermath]
+
+Immediately after the exploit was detected, Crema Finance paused smart contract operations and began investigating with blockchain security experts.
+
+A rare negotiation followed: the team offered the attacker an $800,000 white hat bounty. The attacker accepted, ultimately returning approximately $8.3 million and retaining 45,455 SOL as a bounty.
+
+Crema then initiated a user compensation plan and security overhaul. In July 2023, the U.S. Department of Justice arrested a former security engineer, Shakeeb Ahmed, in connection with the exploit.
+
+---
+
+## :violet[5. Lessons Learnt]
+
+- **:green[Input Validation is Critical:]** Protocols must validate all external accounts, especially those impacting core functions like pricing or fees.
+
+- **:orange[Flash Loans Amplify Exploits:]** Although not inherently malicious, flash loans enable attackers to maximize the damage from logic vulnerabilities.
+
+- **:green[Security Reviews Must Be Continuous:]** One-off audits are not enough. Ongoing review and bug bounty programs are essential.
+
+- **:orange[Protocol Complexity Increases Attack Surface:]** The intricacy of CLMM models introduces more opportunities for logical errors.
+
+- **:green[Effective Incident Response Matters:]** Crema's ability to negotiate and limit losses shows the value of crisis planning.
+
+- **:orange[Accountability is Possible:]** Legal action in the aftermath reaffirms that pseudonymity does not guarantee impunity.
+
+---
+- **:green[Transparency:]** Protocols should clearly communicate technical authority and potential risks to users.
+
+---
+
+## :red[6. Conclusion]
+
+The Crema Finance exploit exposed critical flaws in tick account validation, enabling an attacker to manipulate internal logic and extract inflated fees using flash loans. Despite the initial loss of $8.8 million, most funds were returned via an unprecedented white hat negotiation. This incident reinforced the importance of robust validation, defensive programming, and clear communication protocols during crises. It also signaled growing legal consequences for DeFi exploits, potentially deterring future attackers.
+
+""")

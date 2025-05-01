@@ -4,10 +4,6 @@ from datetime import datetime
 import importlib 
 import re 
 
-import os
-print("Current working directory:", os.getcwd())
-print("Files in current directory:", os.listdir())
-
 
 # --- Configuration ---
 APP_TITLE = "🔐 Solana Security Explorer"
@@ -18,23 +14,124 @@ HOME_VIEW_NAME = "Home"
 # ------------------------------
 incident_data = [
     {"Date": "Feb 2, 2022", "Project / Service": "Wormhole Bridge", "Loss (approx.)": "$326 M", "Type": "Major hack", "Description": "Signature-verification bug allowed minting of 120,000 ETH on Solana.", "Tags": ["bridge", "supply inflation"]},
+
     {"Date": "Mar 23, 2022", "Project / Service": "Cashio (Saber Cash)", "Loss (approx.)": "$52 M", "Type": "Major hack", "Description": "Bypassed unverified-account checks to drain treasury.", "Tags": ["stablecoin", "frontend"]},
+
     {"Date": "Jul 2, 2022", "Project / Service": "Crema Finance", "Loss (approx.)": "$8.78 M", "Type": "Flash-loan exploit", "Description": "Price-oracle manipulation to inflate collateral.", "Tags": ["defi", "oracle", "flash loan"]},
+
     {"Date": "Jul 28, 2022", "Project / Service": "Nirvana Finance", "Loss (approx.)": "$3.5 M", "Type": "Flash-loan exploit", "Description": "Price-oracle manipulation.", "Tags": ["defi", "oracle", "flash loan"]},
+
     {"Date": "Aug 2, 2022", "Project / Service": "Slope Wallet", "Loss (approx.)": "$5.2 M", "Type": "Key-leak", "Description": "Backend stored private keys in plaintext; ~9,229 wallets drained.", "Tags": ["wallet"]},
+
     {"Date": "Aug 29, 2022", "Project / Service": "OptiFi", "Loss (approx.)": "$661 K", "Type": "Logic bug", "Description": "Margin-engine error allowed unauthorized withdrawals.", "Tags": ["defi", "smart contract"]},
+
     {"Date": "Oct 11, 2022", "Project / Service": "Mango Markets", "Loss (approx.)": "$100 M", "Type": "Flash-loan/oracle hack", "Description": "Inflated collateral prices, then withdrew loans.", "Tags": ["oracle", "defi"]},
+
     {"Date": "Oct 12, 2022", "Project / Service": "Tulip Protocol", "Loss (approx.)": "$2.5 M", "Type": "Oracle manipulation", "Description": "Follow-on of Mango exploit via shared price feeds.", "Tags": ["oracle", "defi"]},
+
     {"Date": "Oct 12, 2022", "Project / Service": "UXD Protocol", "Loss (approx.)": "$20 M", "Type": "Oracle manipulation", "Description": "Similar vector as Mango/Tulip.", "Tags": ["oracle", "defi"]},
+
     {"Date": "Nov 2, 2022", "Project / Service": "Solend", "Loss (approx.)": "$1.26 M", "Type": "Oracle-price attack", "Description": "Manipulated SOL/USD feed to trigger liquidations.", "Tags": ["oracle", "defi"]},
+
     {"Date": "Dec 16, 2022", "Project / Service": "Raydium", "Loss (approx.)": "$5.5 M", "Type": "Malware/key theft", "Description": "Trojan on developer’s machine drained pools.", "Tags": ["dex", "key compromise"]},
-    {"Date": "Jan 12, 2023", "Project / Service": "Solana Mobile (app)", "Loss (approx.)": "—", "Type": "API bug", "Description": "Debug endpoint exposed private user data; patched within hours.", "Tags": ["mobile", "api"]},
+
     {"Date": "Apr 15, 2022", "Project / Service": "Phantom Wallet", "Loss (approx.)": "—", "Type": "Clipboard hijack bug", "Description": "Malicious sites could replace copied addresses; patched.", "Tags": ["wallet", "security"]},
+
     {"Date": "Aug 7, 2023", "Project / Service": "Cypher Protocol", "Loss (approx.)": "$1 M", "Type": "Logic-bug exploit", "Description": "Order-matching vulnerability; contracts frozen.", "Tags": ["defi", "smart contract"]},
+
     {"Date": "Sep 14, 2023", "Project / Service": "Jupiter Aggregator", "Loss (approx.)": "—", "Type": "Routing bug", "Description": "Underpriced swap routes could be front-run; fixed pre-exploit.", "Tags": ["dex", "routing"]},
+
     {"Date": "Nov 2, 2023", "Project / Service": "Solflare Wallet", "Loss (approx.)": "—", "Type": "Cross-site scripting", "Description": "XSS in wallet extension UI; patched.", "Tags": ["wallet", "security"]},
+
     {"Date": "Dec 20, 2023", "Project / Service": "Marinade Finance", "Loss (approx.)": "—", "Type": "Oracle lag issue", "Description": "Delayed price feeds risked liquidation; mitigated via guardian set.", "Tags": ["defi", "oracle"]},
-    {"Date": "Jan 18, 2024", "Project / Service": "Serum DEX", "Loss (approx.)": "—", "Type": "Order-book bug", "Description": "Market-order logic could match at stale prices; no major losses reported.", "Tags": ["dex", "order book"]}
+  {
+    "Date": "Dec 14, 2020",
+    "Project / Service": "Turbine",
+    "Loss (approx.)": "—",
+    "Type": "Core Protocol Bug",
+    "Description": "Block-propagation bug caused ~6h outage (fixed in later client versions).",
+    "Tags": ["core protocol", "network outage"]
+  },
+  {
+    "Date": "Sep 14, 2021",
+    "Project / Service": "Grape Protocol IDO",
+    "Loss (approx.)": "—",
+    "Type": "Network DDoS",
+    "Description": "17h network stall under ~300k tx/s DDoS (patched write-lock logic & rate limits).",
+    "Tags": ["network", "DDoS", "congestion"]
+  },
+  {
+    "Date": "Apr 30, 2022",
+    "Project / Service": "Candy Machine NFT Mint",
+    "Loss (approx.)": "—",
+    "Type": "Network DDoS",
+    "Description": "~8h outage under ~6M tx/s flood; bot tax and memory fixes implemented.",
+    "Tags": ["network", "DDoS", "NFT"]
+  },
+  {
+    "Date": "Jun 1, 2022",
+    "Project / Service": "Durable Nonce",
+    "Loss (approx.)": "—",
+    "Type": "Core Protocol Bug",
+    "Description": "~4.5h halt due to double-processing nonces; nonces disabled and patch released.",
+    "Tags": ["core protocol", "bug", "nonce"]
+  },
+  {
+    "Date": "Sep 1, 2022",
+    "Project / Service": "Consensus (Duplicate Block)",
+    "Loss (approx.)": "—",
+    "Type": "Core Protocol Bug",
+    "Description": "~8.5h outage from duplicate-block fork; client logic patched.",
+    "Tags": ["core protocol", "bug", "consensus", "network outage"]
+  },
+  {
+    "Date": "Feb 9, 2023",
+    "Project / Service": "Large Block",
+    "Loss (approx.)": "—",
+    "Type": "Core Protocol Bug",
+    "Description": "Bug in validator software caused network stall; restart required.",
+    "Tags": ["core protocol", "bug", "validator", "network outage"]
+  },
+  {
+    "Date": "Feb 22, 2024",
+    "Project / Service": "Infinite Recompile",
+    "Loss (approx.)": "—",
+    "Type": "Core Protocol Bug",
+    "Description": "~5h halt from legacy-loader infinite loop; legacy loader disabled.",
+    "Tags": ["core protocol", "bug", "runtime", "network outage"]
+  },
+  {
+    "Date": "Apr 26, 2024",
+    "Project / Service": "Loopscale",
+    "Loss (approx.)": "$5.8 M",
+    "Type": "Application Exploit",
+    "Description": "Undercollateralized loan exploit; Loopscale paused operations.",
+    "Tags": ["application exploit", "defi", "lending"]
+  },
+  {
+    "Date": "May 16, 2024",
+    "Project / Service": "Pump.fun",
+    "Loss (approx.)": "$2 M",
+    "Type": "Application Exploit",
+    "Description": "Attack on bonding-curve pools; Pump.fun paused launches.",
+    "Tags": ["application exploit", "defi", "memecoin"]
+  },
+  {
+    "Date": "Nov 16, 2024",
+    "Project / Service": "DEXX",
+    "Loss (approx.)": "$30 M",
+    "Type": "Application Exploit",
+    "Description": "Private-key leak drained ~8600 wallets.",
+    "Tags": ["application exploit", "dex", "key leak"]
+  },
+  {
+    "Date": "Dec 2, 2024",
+    "Project / Service": "@solana/web3.js",
+    "Loss (approx.)": "$0.16 M",
+    "Type": "Supply Chain Attack",
+    "Description": "Malicious npm versions exfiltrated keys; patched within hours.",
+    "Tags": ["supply chain", "development tool", "key leak"]
+  }
 ]
 
 # Convert and sort by date
@@ -269,7 +366,6 @@ if selected_page_from_radio != current_page:
 current_page = st.session_state["page"] # Re-get state in case it was just updated
 
 if current_page == HOME_VIEW_NAME:
-    st.title(":red[This App is not fully functional yet, it is a draft and the real thing should be ready by day end.]")
     st.title("📜 Solana Security Incidents - Chronological Table")
 
     df = pd.DataFrame(incident_data)
@@ -351,6 +447,12 @@ elif current_page in project_names:
             ---
         """) # Add a separator before custom content section
 
+        # --- Back Button ---
+        # Placed at the top of the detail page logic
+        if st.button("⬅ Back to Home", key="top_back_button"):
+            st.session_state["page"] = HOME_VIEW_NAME
+            st.rerun()
+
         # --- Attempt to load and run specific content module ---
         module_name = sanitize_module_name(current_page)
 
@@ -376,9 +478,13 @@ elif current_page in project_names:
     else:
         st.error(f"Could not find details for {current_page}.")
 
+    st.markdown("""
+            ---
+        """) # Add a separator before custom content section
+
     # --- Back Button ---
     # Placed at the end of the detail page logic
-    if st.button("⬅ Back to Home"):
+    if st.button("⬅ Back to Home", key="bottom_back_button"):
         st.session_state["page"] = HOME_VIEW_NAME
         st.rerun()
 
