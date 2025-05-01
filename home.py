@@ -4,10 +4,16 @@ from datetime import datetime
 import importlib 
 import re 
 
+# import os
+# st.write("Files in current directory:", os.listdir())
+
+
 
 # --- Configuration ---
 APP_TITLE = "🔐 Solana Security Explorer"
 HOME_VIEW_NAME = "Home"
+SUMMARY_VIEW_NAME = "Summary"
+CHATBOT_NAME = "Chatbot"
 
 # ------------------------------
 # Incident Data with Tags
@@ -320,7 +326,8 @@ if "page" not in st.session_state:
 
 # Initialize navigation options after incident_data is processed
 project_names = [incident["Project / Service"] for incident in incident_data]
-navigation_options = [HOME_VIEW_NAME] + project_names
+# Include SUMMARY_VIEW_NAME in the list of pages for the sidebar radio button
+navigation_options = [HOME_VIEW_NAME, SUMMARY_VIEW_NAME, CHATBOT_NAME] + project_names
 
 # Extract all unique tags from incident_data
 all_tags = sorted(list(set(tag for incident in incident_data for tag in incident.get("Tags", [])))) # Added .get for safety
@@ -418,6 +425,72 @@ if current_page == HOME_VIEW_NAME:
             cols[5].markdown(row["Severity Score"])
             # Column 7: Tags
             cols[6].markdown(", ".join(row["Tags"]))
+
+
+
+
+
+# ------------------------------
+# Summary Page
+# ------------------------------
+elif current_page == SUMMARY_VIEW_NAME: # Change 'if' to 'elif'
+    st.title("📊 Summary of Solana Security Incidents") # Changed emoji
+
+    # No need for a back button here if sidebar navigation is used
+    # if st.button("⬅ Back to Home", key="summary_back_button"):
+    #     st.session_state["page"] = HOME_VIEW_NAME
+    #     st.rerun()
+    # st.markdown("---") # Optional separator
+
+    try:
+        # Dynamically import the summary module
+        summary_module = importlib.import_module('summary')
+
+        # Check if the module has the display_summary function
+        if hasattr(summary_module, 'display_summary') and callable(summary_module.display_summary):
+            # Call the function, passing the necessary data and the metric function
+            # Make sure incident_data is the up-to-date, sorted list with severity scores
+            summary_module.display_summary(incident_data, display_styled_metric)
+        else:
+            st.warning("Summary module ('summary.py') found, but the required 'display_summary' function is missing or not callable.")
+
+    except ImportError:
+        st.error("Error: Could not find the 'summary.py' file. Make sure it's in the same directory as 'home.py'.")
+    except Exception as e:
+        # Catch potential errors within the summary module's function
+        st.error(f"An error occurred while displaying the summary page: {e}")
+        st.exception(e) # Show traceback for debugging if needed
+
+
+
+
+
+
+# ------------------------------
+# Chatbot Page
+# ------------------------------
+elif current_page == CHATBOT_NAME:
+    st.title("🤖 Solana Security Chatbot")
+
+    try:
+        # Dynamically import the chatbot module
+        chatbot_module = importlib.import_module('chatbot')
+
+        # Check for the display_chatbot function
+        if hasattr(chatbot_module, 'display_chatbot') and callable(chatbot_module.display_chatbot):
+            # Display the chatbot interface
+            chatbot_module.display_chatbot()
+        else:
+            st.warning("Module 'chatbot.py' is found, but the function 'display_chatbot()' is missing or not callable.")
+
+    except ImportError:
+        st.error("❌ Error: Could not find the 'chatbot.py' file. Ensure it's in the same directory as 'home.py'.")
+    except Exception as e:
+        st.error("⚠️ An error occurred while loading the chatbot interface:")
+        st.exception(e)
+
+
+
 
 # ------------------------------
 # Incident Detail Page
