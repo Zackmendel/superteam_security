@@ -1,3 +1,10 @@
 plotly-express==0.4.1
 millify==0.1.1
 plotly==6.0.1
+langchain
+openai
+python-dotenv
+faiss-cpu
+langchain-community
+tiktoken
+langchain-openai
