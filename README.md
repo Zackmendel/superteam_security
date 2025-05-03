@@ -4,9 +4,7 @@
 
 A Streamlit application designed to track, summarize, and answer questions about security incidents and core protocol events within the Solana ecosystem.
 
-**(Optional: Add a Screenshot or GIF Here)**
-<!-- ![App Screenshot](link/to/your/screenshot.png) -->
-*Replace the above comment with an actual image link once you have one!*
+![image](https://github.com/user-attachments/assets/acc697fc-ba5d-4ae1-9a24-1ab02e9b25bc)
 
 ## 📜 Overview
 
