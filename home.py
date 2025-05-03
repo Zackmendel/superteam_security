@@ -265,6 +265,50 @@ def display_styled_metric(label, value, key=None):
     st.markdown(styled_html, unsafe_allow_html=True)
 
 
+
+
+
+
+
+# # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# # ------------------------------
+# # Style & Theme
+# # ------------------------------
+# st.markdown("""
+#     <style>
+#     .main {background-color: #f5f7fa;}
+#     h1 {color: #2c3e50; text-align: center; margin-bottom: 30px;}
+#     h2, h3 {color: #34495e;}
+#     table {font-size: 15px;}
+#     .stButton > button {
+#         background-color: #3498db;
+#         color: white;
+#         border-radius: 8px;
+#         padding: 6px 12px;
+#         transition: background-color 0.3s ease;
+#         margin-right: 5px; /* Add some space between buttons */
+#     }
+#     .stButton > button:hover {
+#         background-color: #2980b9;
+#     }
+#     .block-container {padding-top: 2rem;}
+
+#     /* Style for the interactive table rows */
+#     /* Targets the div wrapping st.container in columns */
+#     div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stHorizontalBlock"]) {
+#          border-bottom: 1px solid #ecf0f1; /* Add subtle row separation */
+#          padding: 5px 0; /* Add padding */
+#     }
+
+#     </style>
+# """, unsafe_allow_html=True)
+
+# # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 🚨🚨🚨🚨IF THIS APP BREAKS IN THE FUTURE DUE TO Fragility: The Zebra Striping CSS selector relying on st-emotion-cache- MASKED and :nth-of-type is the most likely part to break if Streamlit changes its internal HTML structure significantly in future updates.
+# 🚨🚨🚨🚨 UNCOMMENT THE STYLE AND THEME ABOV AND REMOVE THE STYLING BELOW, REMEMBER TO DO SAME FOR THE FOR LOOP AT THE TABLE DISPLAY
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # ------------------------------
 # Style & Theme
 # ------------------------------
@@ -273,7 +317,9 @@ st.markdown("""
     .main {background-color: #f5f7fa;}
     h1 {color: #2c3e50; text-align: center; margin-bottom: 30px;}
     h2, h3 {color: #34495e;}
-    table {font-size: 15px;}
+    /* Removed default table style as we use custom */
+    /* table {font-size: 15px;} */
+
     .stButton > button {
         background-color: #3498db;
         color: white;
@@ -281,21 +327,71 @@ st.markdown("""
         padding: 6px 12px;
         transition: background-color 0.3s ease;
         margin-right: 5px; /* Add some space between buttons */
+        /* Ensure button text aligns well if it wraps */
+        text-align: left;
+        display: inline-block; /* Or block if you want full width */
+        width: 98%; /* Make button fill more of the cell */
     }
     .stButton > button:hover {
         background-color: #2980b9;
     }
     .block-container {padding-top: 2rem;}
 
-    /* Style for the interactive table rows */
-    /* Targets the div wrapping st.container in columns */
-    div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stHorizontalBlock"]) {
-         border-bottom: 1px solid #ecf0f1; /* Add subtle row separation */
-         padding: 5px 0; /* Add padding */
+    /* --- Style for the custom table rows --- */
+    /* Targets the div wrapping each row's columns */
+    div.st-emotion-cache- MASKED > div[data-testid="stVerticalBlock"] > div.st-emotion-cache- MASKED { /* More specific selector */
+        border-bottom: none; /* Remove default bottom border */
+        padding: 8px 5px;    /* Adjust padding */
     }
+
+    /* --- Zebra Striping --- */
+    /* Target the VERTICAL block that likely wraps each row */
+    /* Adjust selector if Streamlit structure changes */
+    div.st-emotion-cache- MASKED:has(div[data-testid="stHorizontalBlock"]) { /* Find the main container holding rows */
+        > div[data-testid="stVerticalBlock"]:nth-of-type(even) > div.st-emotion-cache- MASKED { /* Target even vertical blocks within it */
+             background-color: #e8edf1; /* Light background for even rows */
+             border-radius: 5px; /* Optional: slightly round the row background */
+        }
+    }
+
+
+    /* --- Tag Badge Styling --- */
+    .tag-badge {
+        display: inline-block; /* Allow margin/padding */
+        background-color: #777; /* Default grey */
+        color: white;
+        padding: 2px 8px; /* Small padding */
+        margin: 2px 4px 2px 0; /* Top/Bottom margin added */
+        border-radius: 12px; /* Pill shape */
+        font-size: 0.80em; /* Slightly smaller text */
+        font-weight: 500;
+        line-height: 1.4; /* Adjust line height if text breaks weirdly */
+        text-align: center;
+        white-space: nowrap; /* Prevent badges themselves from breaking line */
+    }
+    /* Specific Tag Colors (add more as needed) */
+    .tag-defi { background-color: #3498db; }
+    .tag-oracle { background-color: #e67e22; }
+    .tag-wallet { background-color: #2ecc71; }
+    .tag-bridge { background-color: #9b59b6; }
+    .tag-core-protocol { background-color: #e74c3c; }
+    .tag-network { background-color: #f1c40f; color: #333; }
+    .tag-key-leak, .tag-key-compromise { background-color: #c0392b; }
+    .tag-exploit { background-color: #d35400; } /* Generic exploit */
+    .tag-flash-loan { background-color: #1abc9c; }
+    .tag-smart-contract { background-color: #8e44ad; }
+    .tag-security { background-color: #2980b9; }
+    .tag-stablecoin { background-color: #16a085; }
+    .tag-supply-chain { background-color: #2c3e50; }
+    .tag-bug { background-color: #e74c3c; }
+    .tag-application-exploit { background-color: #c0392b; }
 
     </style>
 """, unsafe_allow_html=True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 # --- Helper function to sanitize project names into valid module names ---
 def sanitize_module_name(name):
@@ -375,6 +471,17 @@ current_page = st.session_state["page"] # Re-get state in case it was just updat
 if current_page == HOME_VIEW_NAME:
     st.title("📜 Solana Security Incidents - Chronological Table")
 
+    # --- ADDED DESCRIPTION START ---
+    st.markdown(
+        """
+##### Welcome to the Solana Security Explorer! This tool tracks notable security incidents and core protocol events related to the Solana ecosystem.
+
+##### Explore the chronological list below, dive into aggregated insights on the :red[**Summary** page], or ask specific questions using our **:red[Chatbot🤖]**. Use the sidebar to filter incidents by tags or navigate directly.
+        """
+    )
+    st.markdown("---") # Optional: Add a visual separator
+    # --- ADDED DESCRIPTION END ---
+
     df = pd.DataFrame(incident_data)
     df.insert(0, "S/N", range(1, len(df) + 1))
     df_display = df.copy() # Start with a copy
@@ -398,33 +505,85 @@ if current_page == HOME_VIEW_NAME:
 
         st.markdown("---") # Separator below header
 
-        # Display rows using columns and buttons for navigation
+
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        # # Display rows using columns and buttons for navigation
+        # for i, row in df_display.iterrows():
+        #     # Use the same column widths as the header
+        #     cols = st.columns([0.05, 0.15, 0.25, 0.15, 0.15, 0.1, 0.15])
+
+        #     # Column 1: S/N
+        #     cols[0].markdown(row["S/N"])
+        #     # Column 2: Date
+        #     cols[1].markdown(row["Date"])
+
+        #     # Column 3: Project / Service - This column contains the button
+        #     # --- BUTTON LOGIC ---
+        #     # Ensure the button's key is unique per row (using S/N)
+        #     # Clicking the button updates the session state and triggers a rerun
+        #     if cols[2].button(row["Project / Service"], key=f"btn_{row['S/N']}"):
+        #         st.session_state["page"] = row["Project / Service"] # Update state to the project name
+        #         st.rerun() # Trigger Streamlit rerun
+        #     # --- END BUTTON LOGIC ---
+
+        #     # Column 4: Loss
+        #     cols[3].markdown(row["Loss (approx.)"])
+        #     # Column 5: Type
+        #     cols[4].markdown(row["Type"])
+        #     # Column 6: Severity
+        #     cols[5].markdown(row["Severity Score"])
+        #     # Column 7: Tags
+        #     cols[6].markdown(", ".join(row["Tags"]))
+
+
+
+# # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 🚨🚨🚨🚨IF THIS APP BREAKS IN THE FUTURE DUE TO Fragility: The Zebra Striping CSS selector relying on st-emotion-cache- MASKED and :nth-of-type is the most likely part to break if Streamlit changes its internal HTML structure significantly in future updates.
+# 🚨🚨🚨🚨 UNCOMMENT THE FOR LOOP ABOVE AND REMOVE THE LOOP BELOW, REMEMBER TO DO STYLE AND THEME AT THE TOP
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
         for i, row in df_display.iterrows():
             # Use the same column widths as the header
             cols = st.columns([0.05, 0.15, 0.25, 0.15, 0.15, 0.1, 0.15])
 
             # Column 1: S/N
-            cols[0].markdown(row["S/N"])
+            cols[0].markdown(f'<div style="padding-top: 5px;">{row["S/N"]}</div>', unsafe_allow_html=True) # Add padding to vertically center a bit
             # Column 2: Date
-            cols[1].markdown(row["Date"])
+            cols[1].markdown(f'<div style="padding-top: 5px;">{row["Date"]}</div>', unsafe_allow_html=True)
 
-            # Column 3: Project / Service - This column contains the button
-            # --- BUTTON LOGIC ---
-            # Ensure the button's key is unique per row (using S/N)
-            # Clicking the button updates the session state and triggers a rerun
+            # Column 3: Project / Service - Button remains the same
             if cols[2].button(row["Project / Service"], key=f"btn_{row['S/N']}"):
-                st.session_state["page"] = row["Project / Service"] # Update state to the project name
-                st.rerun() # Trigger Streamlit rerun
-            # --- END BUTTON LOGIC ---
+                st.session_state["page"] = row["Project / Service"]
+                st.rerun()
 
             # Column 4: Loss
-            cols[3].markdown(row["Loss (approx.)"])
+            cols[3].markdown(f'<div style="padding-top: 5px;">{row["Loss (approx.)"]}</div>', unsafe_allow_html=True)
             # Column 5: Type
-            cols[4].markdown(row["Type"])
+            cols[4].markdown(f'<div style="padding-top: 5px;">{row["Type"]}</div>', unsafe_allow_html=True)
             # Column 6: Severity
-            cols[5].markdown(row["Severity Score"])
-            # Column 7: Tags
-            cols[6].markdown(", ".join(row["Tags"]))
+            cols[5].markdown(f'<div style="padding-top: 5px;">{row["Severity Score"]}</div>', unsafe_allow_html=True)
+
+            # Column 7: Tags - Generate HTML Badges
+            tags = row.get("Tags", [])
+            if tags:
+                tags_html = ""
+                for tag in tags:
+                    # Create a CSS-friendly class name (lowercase, hyphenated)
+                    # Handle slashes and other potential characters if needed
+                    tag_class_raw = re.sub(r'[^a-z0-9\s-]', '', tag.lower()) # Keep letters, numbers, space, hyphen
+                    tag_class_name = "tag-" + re.sub(r'\s+', '-', tag_class_raw).strip('-')
+                    tags_html += f'<span class="tag-badge {tag_class_name}">{tag}</span> ' # Add space after badge
+                cols[6].markdown(tags_html, unsafe_allow_html=True)
+            else:
+                cols[6].markdown("—") # Display dash if no tags
+
+            # Add a subtle bottom border using markdown's HR if background fails
+            # st.markdown("---") # Uncomment if Zebra background isn't reliable
 
 
 
@@ -436,11 +595,20 @@ if current_page == HOME_VIEW_NAME:
 elif current_page == SUMMARY_VIEW_NAME: # Change 'if' to 'elif'
     st.title("📊 Summary of Solana Security Incidents") # Changed emoji
 
-    # No need for a back button here if sidebar navigation is used
-    # if st.button("⬅ Back to Home", key="summary_back_button"):
-    #     st.session_state["page"] = HOME_VIEW_NAME
-    #     st.rerun()
-    # st.markdown("---") # Optional separator
+    col_1, col_2, col_3 = st.columns([1.5, 1.5, 6])
+    with col_1:
+        # No need for a back button here if sidebar navigation is used
+        if st.button("⬅ Back to Home", key="summary_back_button"):
+                st.session_state["page"] = HOME_VIEW_NAME
+                st.rerun()
+        
+    with col_2:
+        # No need for a back button here if sidebar navigation is used
+        if st.button("⬅ Ask Chatbot🤖", key="chatbot_button"):
+                st.session_state["page"] = CHATBOT_NAME
+                st.rerun()
+
+    st.markdown("---") # Optional separator
 
     try:
         # Dynamically import the summary module
@@ -460,6 +628,21 @@ elif current_page == SUMMARY_VIEW_NAME: # Change 'if' to 'elif'
         # Catch potential errors within the summary module's function
         st.error(f"An error occurred while displaying the summary page: {e}")
         st.exception(e) # Show traceback for debugging if needed
+
+    st.markdown("---")
+
+    col_1, col_2, col_3 = st.columns([1.5, 1.5, 6])
+    with col_1:
+        # No need for a back button here if sidebar navigation is used
+        if st.button("⬅ Back to Home", key="summary_buttom_back_button"):
+                st.session_state["page"] = HOME_VIEW_NAME
+                st.rerun()
+        
+    with col_2:
+        # No need for a back button here if sidebar navigation is used
+        if st.button("⬅ Ask Chatbot🤖", key="chatbot_buttom_button"):
+                st.session_state["page"] = CHATBOT_NAME
+                st.rerun()
 
 
 
@@ -488,6 +671,19 @@ elif current_page == CHATBOT_NAME:
     except Exception as e:
         st.error("⚠️ An error occurred while loading the chatbot interface:")
         st.exception(e)
+
+    st.markdown("""
+            ---
+        """) # Add a separator before custom content section
+
+    # --- Back Button ---
+    # Placed at the end of the detail page logic
+    col_1, col_2, col_3 = st.columns([1.5, 1.5, 6])
+    with col_1:
+        if st.button("⬅ Back to Home", key="bottom_back_button"):
+            st.session_state["page"] = HOME_VIEW_NAME
+            st.rerun()
+        
 
 
 
@@ -522,9 +718,16 @@ elif current_page in project_names:
 
         # --- Back Button ---
         # Placed at the top of the detail page logic
-        if st.button("⬅ Back to Home", key="top_back_button"):
-            st.session_state["page"] = HOME_VIEW_NAME
-            st.rerun()
+        col_1, col_2, col_3 = st.columns([1.5, 1.5, 6])
+        with col_1:
+            if st.button("⬅ Back to Home", key="top_back_button"):
+                st.session_state["page"] = HOME_VIEW_NAME
+                st.rerun()
+            
+        with col_2:
+            if st.button("⬅ Ask Chatbot🤖", key="chatbot_top_button"):
+                    st.session_state["page"] = CHATBOT_NAME
+                    st.rerun()
 
         # --- Attempt to load and run specific content module ---
         module_name = sanitize_module_name(current_page)
@@ -557,9 +760,16 @@ elif current_page in project_names:
 
     # --- Back Button ---
     # Placed at the end of the detail page logic
-    if st.button("⬅ Back to Home", key="bottom_back_button"):
-        st.session_state["page"] = HOME_VIEW_NAME
-        st.rerun()
+    col_1, col_2, col_3 = st.columns([1.5, 1.5, 6])
+    with col_1:
+        if st.button("⬅ Back to Home", key="bottom_back_button"):
+            st.session_state["page"] = HOME_VIEW_NAME
+            st.rerun()
+        
+    with col_2:
+        if st.button("⬅ Ask Chatbot🤖", key="chatbot_bottom_button"):
+                st.session_state["page"] = CHATBOT_NAME
+                st.rerun()
 
 # You might want to add a final 'else' block here to handle cases
 # where st.session_state["page"] is set to something unexpected
