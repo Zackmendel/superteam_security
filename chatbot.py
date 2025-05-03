@@ -1,8 +1,89 @@
 import os
 import streamlit as st
 
+
+def display_chatbot():
+    st.markdown("""
+        <style>
+            /* Target the chat container */
+            /* Note: Selectors might change with Streamlit updates. Inspect element if needed. */
+            .stChatInput, .stChatInput > div {
+                /* background-color: #f0f2f6; */ /* Example: Light background for input */
+            }
+
+            /* Style message bubbles */
+            [data-testid="stChatMessage"] {
+                border-radius: 10px;
+                padding: 12px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                max-width: 85%; /* Prevent messages from taking full width */
+            }
+
+            /* Style user messages */
+            /* Find the parent div of user messages (might need inspection) */
+            /* This selector targets the container Streamlit usually wraps messages in */
+            div[data-testid="stVerticalBlock"] div:has(> [data-testid="stChatMessage"]):has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessage"] {
+                background-color: #dcf8c6; /* Light green, similar to WhatsApp */
+                margin-left: auto; /* Align to the right */
+                border-bottom-right-radius: 0; /* 'Tail' effect */
+            }
+            /* Alternatively, if the above is too complex/brittle, target based on content alignment Streamlit might apply */
+            /* This is less reliable */
+             [data-testid="stChatMessage"]:has(div[style*="text-align: right"]) {
+                 /* background-color: #dcf8c6; */
+                 /* margin-left: auto; */
+             }
+
+
+            /* Style assistant messages */
+            div[data-testid="stVerticalBlock"] div:has(> [data-testid="stChatMessage"]):has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessage"] {
+                 background-color: #ffffff; /* White background */
+                 margin-right: auto; /* Align to the left */
+                 border-bottom-left-radius: 0; /* 'Tail' effect */
+            }
+             /* Alternatively, if the above is too complex/brittle */
+             [data-testid="stChatMessage"]:has(div[style*="text-align: left"]) {
+                 /* background-color: #ffffff; */
+                 /* margin-right: auto; */
+             }
+
+            /* Add Avatars (using emojis here, could use background-image with URLs/base64) */
+            [data-testid="chatAvatarIcon-user"]::after {
+                content: '👤';
+                font-size: 1.5em;
+                margin-right: 5px; /* Adjust spacing */
+            }
+            [data-testid="chatAvatarIcon-assistant"]::after {
+                content: '🤖';
+                font-size: 1.5em;
+                 margin-right: 5px; /* Adjust spacing */
+            }
+
+             /* Style the chat input area */
+            [data-testid="stChatInput"] {
+                background-color: #f0f2f6; /* Light grey background */
+                border-top: 1px solid #e0e0e0;
+                padding: 10px 15px;
+            }
+             /* Target the actual text input field within stChatInput */
+            [data-testid="stChatInput"] textarea {
+                 border: 1px solid #ccc;
+                 border-radius: 15px;
+                 padding: 8px 12px;
+            }
+            /* Style the send button (if possible - selector might be tricky) */
+            [data-testid="stChatInput"] button {
+                border-radius: 50%; /* Make it round */
+                /* Add other button styling */
+            }
+
+        </style>
+    """, unsafe_allow_html=True)
+
 # Load OpenAI API key securely from Streamlit secrets
 os.environ["OPENAI_API_KEY"] = st.secrets["api_key"]
+
 
 
 from langchain.embeddings import OpenAIEmbeddings
@@ -61,7 +142,9 @@ Answer:""",
 
     # Initialize chat messages
     if 'messages' not in st.session_state:
-        st.session_state['messages'] = []
+        st.session_state['messages'] = [
+        {"role": "assistant", "content": "Hi! Ask me anything about Solana security and I would answer based on my the knowledge on the contents of this App."}
+    ]
 
     # Display chat messages
     for msg in st.session_state['messages']:
@@ -81,6 +164,8 @@ Answer:""",
                 st.write(answer)
         # Record assistant message
         st.session_state['messages'].append({"role": "assistant", "content": answer})
+
+    
 
 # if __name__ == "__main__":
 def display_chatbot():
